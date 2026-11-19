@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" data-lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Umutcan Alanyali</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff; --bg-secondary: #f5f5f7; --bg-card: #ffffff;
+      --text-primary: #1d1d1f; --text-secondary: #6e6e73; --text-tertiary: #aeaeb2;
+      --border: #d2d2d7; --accent: #0071e3; --accent-hover: #0077ed;
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+      --nav-width: 228px; --top-h: 56px;
+    }
+    [data-theme="dark"] {
+      --bg: #0a0a0a; --bg-secondary: #1c1c1e; --bg-card: #161618;
+      --text-primary: #f5f5f7; --text-secondary: #98989d; --text-tertiary: #58585c;
+      --border: #2c2c2e; --accent: #2997ff; --accent-hover: #42a5ff;
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      background: var(--bg); color: var(--text-primary); line-height: 1.6;
+      transition: background 0.25s, color 0.25s; -webkit-font-smoothing: antialiased;
+    }
+
+    /* TOP BAR */
+    .top-bar {
+      position: fixed; top: 0; left: 0; right: 0; height: var(--top-h);
+      background: rgba(255,255,255,0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; z-index: 200; transition: background 0.25s, border-color 0.25s;
+    }
+    [data-theme="dark"] .top-bar { background: rgba(10,10,10,0.85); }
+    .top-bar-left { display: flex; align-items: center; gap: 16px; }
+    .top-bar-name { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+    .top-bar-nav { display: flex; align-items: center; gap: 2px; }
+    .top-nav-link {
+      font-size: 13.5px; color: var(--text-secondary); text-decoration: none;
+      display: flex; align-items: center; gap: 4px; padding: 5px 10px;
+      border-radius: 7px; transition: color 0.15s, background 0.15s;
+    }
+    .top-nav-link:hover { color: var(--text-primary); background: var(--bg-secondary); }
+    .top-nav-link svg { opacity: 0.55; }
+    .top-bar-right { display: flex; align-items: center; gap: 4px; }
+    .clock-wrap {
+      display: flex; align-items: center; gap: 7px;
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 4px 11px; margin-right: 6px;
+    }
+    .clock {
+      font-family: "JetBrains Mono", monospace; font-size: 13px;
+      color: var(--text-secondary); letter-spacing: 0.03em; min-width: 72px;
+    }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #34c759;
+      flex-shrink: 0; position: relative;
+    }
+    .status-dot::after {
+      content: ''; position: absolute; inset: -3px; border-radius: 50%;
+      background: #34c759; opacity: 0.5;
+      animation: pulse-ring 2s ease-out infinite;
+    }
+    @keyframes pulse-ring {
+      0%   { transform: scale(0.8); opacity: 0.5; }
+      100% { transform: scale(2.4); opacity: 0; }
+    }
+    .icon-btn {
+      background: none; border: none; cursor: pointer; color: var(--text-secondary);
+      display: flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px; border-radius: 8px;
+      transition: background 0.15s, color 0.15s; text-decoration: none; font-size: 12px;
+    }
+    .icon-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+    .lang-btn {
+      font-family: "JetBrains Mono", monospace; font-size: 11px; font-weight: 600;
+      letter-spacing: 0.06em; width: auto; padding: 0 10px;
+      border: 1px solid var(--border); border-radius: 6px;
+      color: var(--text-secondary); background: none; cursor: pointer;
+      height: 28px; transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .lang-btn:hover { background: var(--bg-secondary); color: var(--text-primary); border-color: var(--text-secondary); }
+
+    /* SIDEBAR */
+    .sidebar {
+      position: fixed; top: var(--top-h); left: 0; width: var(--nav-width);
+      height: calc(100vh - var(--top-h)); border-right: 1px solid var(--border);
+      padding: 28px 12px; overflow-y: auto;
+    }
+    .nav-group-label {
+      font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--text-tertiary); padding: 0 12px; margin-bottom: 4px; margin-top: 20px;
+    }
+    .nav-group-label:first-child { margin-top: 0; }
+    .nav-link {
+      display: flex; align-items: center; gap: 10px; padding: 7px 12px; border-radius: 8px;
+      font-size: 13.5px; color: var(--text-secondary); text-decoration: none;
+      transition: background 0.12s, color 0.12s; user-select: none;
+    }
+    .nav-link:hover { background: var(--bg-secondary); color: var(--text-primary); }
+    .nav-link.active { background: var(--bg-secondary); color: var(--text-primary); font-weight: 500; }
+    .nav-link svg { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.55; }
+    .nav-link.active svg { opacity: 0.9; }
+
+    /* MAIN */
+    .main {
+      margin-left: var(--nav-width); margin-top: var(--top-h);
+      padding: 64px 80px 80px; max-width: calc(var(--nav-width) + 760px);
+    }
+    .section { margin-bottom: 88px; scroll-margin-top: calc(var(--top-h) + 40px); }
+    .s-label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--accent); margin-bottom: 6px;
+    }
+    .s-title { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 28px; line-height: 1.2; }
+
+    /* INTRO */
+    .intro-name { font-size: 60px; font-weight: 700; letter-spacing: -0.035em; line-height: 1.05; margin-bottom: 14px; }
+    .intro-role { font-size: 19px; color: var(--text-secondary); font-weight: 400; margin-bottom: 20px; letter-spacing: -0.01em; }
+    .intro-bio { font-size: 16px; color: var(--text-secondary); max-width: 520px; line-height: 1.7; margin-bottom: 28px; }
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 7px; padding: 6px 13px;
+      background: var(--bg-secondary); border: 1px solid var(--border);
+      border-radius: 980px; font-size: 13px; font-weight: 500; color: var(--text-secondary);
+    }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #34c759; flex-shrink: 0; }
+    .cta { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px;
+      background: var(--accent); color: #fff; border-radius: 980px;
+      font-size: 14.5px; font-weight: 500; text-decoration: none;
+      transition: background 0.15s, transform 0.15s;
+    }
+    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px;
+      background: var(--bg-secondary); border: 1px solid var(--border);
+      color: var(--text-primary); border-radius: 980px; font-size: 14.5px; font-weight: 500;
+      text-decoration: none; transition: background 0.15s, transform 0.15s;
+    }
+    .btn-secondary:hover { background: var(--border); transform: translateY(-1px); }
+
+    /* ABOUT */
+    .about-p { font-size: 16px; color: var(--text-secondary); line-height: 1.75; max-width: 620px; margin-bottom: 18px; }
+    .about-p strong { color: var(--text-primary); font-weight: 500; }
+    .about-p:last-child { margin-bottom: 0; }
+
+    /* PROJECTS */
+    .projects-list { display: flex; flex-direction: column; gap: 14px; }
+    .project-card {
+      display: block; text-decoration: none; color: inherit;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 28px 32px;
+      transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+    }
+    .project-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--accent); }
+    .project-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .project-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent); margin-bottom: 6px; }
+    .project-name { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 8px; }
+    .project-desc { font-size: 14.5px; color: var(--text-secondary); line-height: 1.65; margin-bottom: 18px; }
+    .project-arrow { color: var(--text-tertiary); flex-shrink: 0; margin-top: 4px; transition: color 0.15s, transform 0.15s; }
+    .project-card:hover .project-arrow { color: var(--accent); transform: translate(3px, -3px); }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag { padding: 4px 10px; background: var(--bg-secondary); border-radius: 980px; font-size: 12px; font-weight: 500; color: var(--text-secondary); font-family: "JetBrains Mono", monospace; }
+
+    /* SKILLS */
+    .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .skill-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; }
+    .skill-card-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 14px; }
+
+    /* EXPERIENCE */
+    .timeline { position: relative; padding-left: 20px; }
+    .timeline::before { content: ''; position: absolute; left: 0; top: 10px; bottom: 10px; width: 1px; background: var(--border); }
+    .tl-item { position: relative; margin-bottom: 40px; }
+    .tl-item:last-child { margin-bottom: 0; }
+    .tl-item::before { content: ''; position: absolute; left: -24px; top: 7px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); }
+    .tl-date { font-size: 12px; color: var(--text-tertiary); font-family: "JetBrains Mono", monospace; letter-spacing: 0.02em; margin-bottom: 3px; }
+    .tl-title { font-size: 15.5px; font-weight: 600; margin-bottom: 2px; }
+    .tl-company { font-size: 13.5px; color: var(--accent); font-weight: 500; margin-bottom: 10px; }
+    .tl-bullets { list-style: none; }
+    .tl-bullets li { font-size: 13.5px; color: var(--text-secondary); padding: 3px 0 3px 14px; position: relative; line-height: 1.6; }
+    .tl-bullets li::before { content: '·'; position: absolute; left: 0; color: var(--text-tertiary); }
+
+    /* EDUCATION */
+    .edu-list { display: flex; flex-direction: column; gap: 12px; }
+    .edu-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 22px 26px; display: flex; gap: 18px; align-items: flex-start; }
+    .edu-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--bg-secondary); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .edu-degree { font-size: 15.5px; font-weight: 600; margin-bottom: 2px; }
+    .edu-school { font-size: 13.5px; color: var(--accent); font-weight: 500; margin-bottom: 3px; }
+    .edu-date { font-size: 12px; color: var(--text-tertiary); font-family: "JetBrains Mono", monospace; margin-bottom: 6px; }
+    .edu-note { font-size: 13px; color: var(--text-secondary); line-height: 1.55; }
+    .pill { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; background: #e5f1ff; color: var(--accent); padding: 2px 8px; border-radius: 980px; margin-left: 6px; vertical-align: middle; }
+    [data-theme="dark"] .pill { background: #0a2440; }
+
+    /* CONTACT */
+    .contact-list { display: flex; flex-direction: column; gap: 10px; }
+    .contact-link { display: flex; align-items: center; gap: 14px; padding: 15px 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; text-decoration: none; color: var(--text-primary); font-size: 14.5px; font-weight: 500; transition: background 0.15s, transform 0.15s; }
+    .contact-link:hover { background: var(--bg-secondary); transform: translateX(4px); }
+    .contact-link svg { color: var(--text-secondary); flex-shrink: 0; }
+    .contact-link-sub { font-size: 12px; color: var(--text-secondary); font-weight: 400; margin-left: auto; }
+    .footer { border-top: 1px solid var(--border); padding: 32px 0 0; font-size: 12.5px; color: var(--text-tertiary); display: flex; align-items: center; justify-content: space-between; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    @media (max-width: 900px) { .sidebar { display: none; } .main { margin-left: 0; padding: 32px 24px 60px; } .intro-name { font-size: 40px; } .skills-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 600px) { .intro-name { font-size: 32px; } .main { padding: 24px 16px 60px; } }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="top-bar">
+  <div class="top-bar-name">Umutcan Alanyali</div>
+  <div class="top-bar-right">
+    <div class="clock-wrap">
+      <span class="status-dot"></span>
+      <span class="clock" id="clock">00:00:00</span>
+    </div>
+    <button class="lang-btn" id="lang-btn" onclick="toggleLang()" title="Switch language">EN</button>
+    <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
+      <svg id="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+    <a href="https://www.linkedin.com/in/ualanyal/" target="_blank" class="icon-btn" title="LinkedIn" aria-label="LinkedIn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+    </a>
+    <a href="https://github.com/umalanyali" target="_blank" class="icon-btn" title="GitHub" aria-label="GitHub">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+    </a>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="nav-group-label" data-i18n="nav_label">Navigation</div>
+  <a class="nav-link active" href="#introduction">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+    <span data-i18n="nav_intro">Introduction</span>
+  </a>
+  <a class="nav-link" href="#about">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span data-i18n="nav_about">About Me</span>
+  </a>
+  <a class="nav-link" href="#projects">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    <span data-i18n="nav_projects">Projects</span>
+  </a>
+  <a class="nav-link" href="#skills">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+    <span data-i18n="nav_skills">Skills &amp; Tools</span>
+  </a>
+  <a class="nav-link" href="#experience">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+    <span data-i18n="nav_exp">Experience</span>
+  </a>
+  <a class="nav-link" href="#education">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+    <span data-i18n="nav_edu">Education</span>
+  </a>
+  <a class="nav-link" href="#contact">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+    <span data-i18n="nav_contact">Contact</span>
+  </a>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- INTRODUCTION -->
+  <section class="section" id="introduction">
+    <div class="s-label" data-i18n="nav_intro">Introduction</div>
+    <h1 class="intro-name">Umutcan<br>Alanyali</h1>
+    <p class="intro-role">AI/ML Engineering &amp; Consulting</p>
+    <p class="intro-bio" data-i18n="intro_bio">I build AI agents that actually get used. Currently working at Müller Merkle Immobilien, automating research workflows with LangChain and n8n, while finishing a double Master's in Data Engineering and Computer Science.</p>
+    <div class="badges">
+      <span class="badge"><span class="badge-dot"></span><span data-i18n="badge_avail">Available now</span></span>
+      <span class="badge">📍 Mannheim, Germany</span>
+      <span class="badge" data-i18n="badge_lang">🇩🇪 🇹🇷 Native &nbsp;·&nbsp; 🇬🇧 C1</span>
+      <span class="badge">🏀 &nbsp; 🎸 &nbsp; 📚</span>
+    </div>
+    <div class="cta">
+      <a href="https://ki-portfolio-umalanyali.streamlit.app" target="_blank" class="btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        <span data-i18n="cta_portfolio">View KI-Portfolio</span>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ABOUT ME -->
+  <section class="section" id="about">
+    <div class="s-label" data-i18n="nav_about">About Me</div>
+    <h2 class="s-title" data-i18n="about_title">Building AI that actually gets used.</h2>
+    <p class="about-p" data-i18n="about_p1">I got into AI through UX research. Quantitative studies, design systems, behavior analysis. At some point I noticed both need the same core skill. You have to understand how people actually work before you can build something useful for them.</p>
+    <p class="about-p" data-i18n="about_p2">At <strong>Müller Merkle Immobilien</strong> I noticed that a lot of research workflows were repetitive and saw the automation potential. I proposed AI automations on my own initiative, built the agents in LangChain with a Streamlit frontend, deployed them locally, and the tool ended up actually being used for market research. I also took the proposal to management myself. That's the part I'm most proud of.</p>
+    <p class="about-p" data-i18n="about_p3">What I bring is a mix of technical depth and business sense. Quantitative research at IONOS and 1&amp;1, hands-on AI development with LangChain, n8n and RAG, and a double Master's in Data Engineering and Computer Science.</p>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="section" id="projects">
+    <div class="s-label" data-i18n="nav_projects">Projects</div>
+    <h2 class="s-title" data-i18n="proj_title">KI-Portfolio — 3 Live Agents</h2>
+    <div class="projects-list">
+
+      <a href="https://ki-portfolio-umalanyali.streamlit.app/Dokument_Assistent" target="_blank" class="project-card">
+        <div class="project-top">
+          <div>
+            <div class="project-label">Agent 01 · RAG</div>
+            <div class="project-name">Dokument-Assistent</div>
+          </div>
+          <svg class="project-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </div>
+        <p class="project-desc" data-i18n="proj1_desc">Drop in any PDF and start chatting. The agent splits the document into chunks, embeds them with OpenAI, finds the most relevant parts for each question and cites its sources. Built with LangChain, ChromaDB and GPT-4o-mini.</p>
+        <div class="tags"><span class="tag">LangChain</span><span class="tag">ChromaDB</span><span class="tag">RAG</span><span class="tag">GPT-4o-mini</span><span class="tag">Streamlit</span></div>
+      </a>
+
+      <a href="https://ki-portfolio-umalanyali.streamlit.app/Unternehmensanalyse" target="_blank" class="project-card">
+        <div class="project-top">
+          <div>
+            <div class="project-label">Agent 02 · Web Research</div>
+            <div class="project-name">Unternehmensanalyse</div>
+          </div>
+          <svg class="project-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </div>
+        <p class="project-desc" data-i18n="proj2_desc">Type a company name and get back a full research report. The agent searches the web via Tavily, reads through multiple sources and writes a structured German report on business model, market position and AI potential. PDF export included.</p>
+        <div class="tags"><span class="tag">LangChain Agent</span><span class="tag">Tavily Search</span><span class="tag">GPT-4o-mini</span><span class="tag">PDF Export</span></div>
+      </a>
+
+      <a href="https://ki-portfolio-umalanyali.streamlit.app/KI_Readiness_Check" target="_blank" class="project-card">
+        <div class="project-top">
+          <div>
+            <div class="project-label">Agent 03 · Assessment</div>
+            <div class="project-name">KI-Readiness Check</div>
+          </div>
+          <svg class="project-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </div>
+        <p class="project-desc" data-i18n="proj3_desc">Ten questions across five dimensions: data, processes, team, leadership and infrastructure. The result is a scored report with concrete AI transformation priorities. Animated score reveal and PDF export included.</p>
+        <div class="tags"><span class="tag">LangChain</span><span class="tag">Scoring Engine</span><span class="tag">GPT-4o-mini</span><span class="tag">Animation</span><span class="tag">PDF Export</span></div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="section" id="skills">
+    <div class="s-label" data-i18n="nav_skills">Skills &amp; Tools</div>
+    <h2 class="s-title" data-i18n="skills_title">What I work with.</h2>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="skill-card-title">Agentic AI &amp; LLM</div>
+        <div class="tags"><span class="tag">LangChain</span><span class="tag">n8n</span><span class="tag">RAG</span><span class="tag">Prompt Eng.</span><span class="tag">MCP</span><span class="tag">GPT-4o</span><span class="tag">Agentic AI</span></div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-title" data-i18n="skill_prog">Programming</div>
+        <div class="tags"><span class="tag">Python</span><span class="tag">pandas</span><span class="tag">scikit-learn</span><span class="tag">SQL</span><span class="tag">REST APIs</span><span class="tag">Git</span><span class="tag">Streamlit</span></div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-title" data-i18n="skill_consult">Consulting &amp; Methods</div>
+        <div class="tags"><span class="tag">Requirements Eng.</span><span class="tag">Stakeholder Comms</span><span class="tag">Workshop Facilitation</span><span class="tag">Data Viz</span><span class="tag">Agile</span></div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-title" data-i18n="skill_design">Design &amp; UX</div>
+        <div class="tags"><span class="tag">Figma</span><span class="tag">UX Research</span><span class="tag">Design Systems</span><span class="tag">Quant. Studies</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section class="section" id="experience">
+    <div class="s-label" data-i18n="nav_exp">Experience</div>
+    <h2 class="s-title" data-i18n="exp_title">Where I've worked.</h2>
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-date">11/2026 – <span data-i18n="present">Present</span></div>
+        <div class="tl-title" data-i18n="exp1_title">Research Analyst &amp; AI Development</div>
+        <div class="tl-company">Müller Merkle Immobilien GmbH · Heidelberg</div>
+        <ul class="tl-bullets">
+          <li data-i18n="exp1_b1">Built LangChain RAG pipelines for market data analysis on my own initiative</li>
+          <li data-i18n="exp1_b2">Built agentic n8n workflows connecting multiple APIs and automating recurring research tasks</li>
+          <li data-i18n="exp1_b3">Built a house price prediction model and translated the findings for non-technical decision makers</li>
+          <li data-i18n="exp1_b4">Market research and competitive analysis in Python, with pricing recommendations for the team</li>
+        </ul>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">11/2025 – 10/2026</div>
+        <div class="tl-title" data-i18n="exp2_title">UX Design &amp; Digital Experience</div>
+        <div class="tl-company">1&amp;1 Telecommunication SE · Karlsruhe</div>
+        <ul class="tl-bullets">
+          <li data-i18n="exp2_b1">Bridged UX standards and AI integration in the product design system</li>
+          <li data-i18n="exp2_b2">Designed campaign content for the online shop, documented Figma components and UX guidelines</li>
+          <li data-i18n="exp2_b3">Quality assurance in staging environments, cross-team collaboration in the Digital Experience group</li>
+        </ul>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">03/2024 – 04/2025</div>
+        <div class="tl-title" data-i18n="exp3_title">UX Researcher · Quantitative Methods</div>
+        <div class="tl-company">IONOS · Karlsruhe</div>
+        <ul class="tl-bullets">
+          <li data-i18n="exp3_b1">Ran quantitative user studies in Python and turned the data into concrete product recommendations</li>
+        </ul>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">09/2023 – 02/2024</div>
+        <div class="tl-title" data-i18n="exp4_title">Internship · Digitalization &amp; Process Development</div>
+        <div class="tl-company">weisenburger bau GmbH · Karlsruhe</div>
+        <ul class="tl-bullets">
+          <li data-i18n="exp4_b1">Designed digital processes for the ERP system, gathered requirements and collected operational data</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section class="section" id="education">
+    <div class="s-label" data-i18n="nav_edu">Education</div>
+    <h2 class="s-title" data-i18n="edu_title">Academic background.</h2>
+    <div class="edu-list">
+
+      <div class="edu-card">
+        <div class="edu-icon">🎓</div>
+        <div>
+          <div class="edu-degree">M.Sc. Data Engineering and Consulting <span class="pill">berufsbegleitend</span></div>
+          <div class="edu-school">Hochschule Albstadt-Sigmaringen</div>
+          <div class="edu-date">10/2026 – 03/2028 (<span data-i18n="expected">expected</span>)</div>
+          <div class="tags" style="margin-top:6px"><span class="tag">Digital Marketing</span><span class="tag">ERP Systems</span><span class="tag">Machine Learning</span><span class="tag">Data Science</span><span class="tag">Python</span><span class="tag">Agentic AI</span><span class="tag">Database Mgmt</span><span class="tag">Intrapreneurship</span><span class="tag">Agile</span></div>
+        </div>
+      </div>
+
+      <div class="edu-card">
+        <div class="edu-icon">🇮🇹</div>
+        <div>
+          <div class="edu-degree">M.Sc. Computer Science <span class="pill">Double Degree</span></div>
+          <div class="edu-school">Università degli Studi Guglielmo Marconi · Rome</div>
+          <div class="edu-date">2026 – 2028 (<span data-i18n="expected">expected</span>)</div>
+          <div class="tags" style="margin-top:6px"><span class="tag">Computer Networks</span><span class="tag">Database</span><span class="tag">Software Engineering</span><span class="tag">IT Security</span></div>
+        </div>
+      </div>
+
+      <div class="edu-card">
+        <div class="edu-icon">📚</div>
+        <div>
+          <div class="edu-degree">B.A. Kommunikations- und Medienmanagement</div>
+          <div class="edu-school">Hochschule Karlsruhe – University of Applied Sciences</div>
+          <div class="edu-date">09/2021 – 05/2026</div>
+          <div class="edu-note" data-i18n="edu3_note">Bachelor thesis on the perception of AI-generated visual content. Grade 1.0, N=151, Python analysis.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section" id="contact">
+    <div class="s-label" data-i18n="nav_contact">Contact</div>
+    <h2 class="s-title" data-i18n="contact_title">Let's connect.</h2>
+    <div class="contact-list">
+      <a href="mailto:ualanyal@gmail.com" class="contact-link">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        ualanyal@gmail.com
+        <span class="contact-link-sub">Email</span>
+      </a>
+      <a href="https://www.linkedin.com/in/ualanyal/" target="_blank" class="contact-link">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        linkedin.com/in/ualanyal
+        <span class="contact-link-sub">LinkedIn</span>
+      </a>
+      <a href="https://github.com/umalanyali" target="_blank" class="contact-link">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        github.com/umalanyali
+        <span class="contact-link-sub">GitHub</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="footer">
+    <span>© 2026 Umutcan Alanyali</span>
+    <span data-i18n="footer_host">Hosted on GitHub Pages</span>
+  </div>
+
+</main>
+
+<script>
+// ── TRANSLATIONS ──
+const T = {
+  en: {
+    nav_label:"Navigation", nav_intro:"Introduction", nav_about:"About Me",
+    nav_projects:"Projects", nav_skills:"Skills & Tools", nav_exp:"Experience",
+    nav_edu:"Education", nav_contact:"Contact",
+    intro_bio:"I build AI agents that actually get used. Currently working at Müller Merkle Immobilien, automating research workflows with LangChain and n8n, while finishing a double Master's in Data Engineering and Computer Science.",
+    badge_avail:"Available now",
+    badge_lang:"🇩🇪 🇹🇷 Native &nbsp;·&nbsp; 🇬🇧 C1",
+    cta_portfolio:"View KI-Portfolio",
+    about_title:"Building AI that actually gets used.",
+    about_p1:"I got into AI through UX research. Quantitative studies, design systems, behavior analysis. At some point I noticed both need the same core skill. You have to understand how people actually work before you can build something useful for them.",
+    about_p2:"At <strong>Müller Merkle Immobilien</strong> I noticed that a lot of research workflows were repetitive and saw the automation potential. I proposed AI automations on my own initiative, built the agents in LangChain with a Streamlit frontend, deployed them locally, and the tool ended up actually being used for market research. I also took the proposal to management myself. That's the part I'm most proud of.",
+    about_p3:"What I bring is a mix of technical depth and business sense. Quantitative research at IONOS and 1&amp;1, hands-on AI development with LangChain, n8n and RAG, and a double Master's in Data Engineering and Computer Science.",
+    proj_title:"KI-Portfolio — 3 Live Agents",
+    proj1_desc:"Drop in any PDF and start chatting. The agent splits the document into chunks, embeds them with OpenAI, finds the most relevant parts for each question and cites its sources. Built with LangChain, ChromaDB and GPT-4o-mini.",
+    proj2_desc:"Type a company name and get back a full research report. The agent searches the web via Tavily, reads through multiple sources and writes a structured German report on business model, market position and AI potential. PDF export included.",
+    proj3_desc:"Ten questions across five dimensions: data, processes, team, leadership and infrastructure. The result is a scored report with concrete AI transformation priorities. Animated score reveal and PDF export included.",
+    skills_title:"What I work with.",
+    skill_prog:"Programming", skill_consult:"Consulting & Methods", skill_design:"Design & UX",
+    exp_title:"Where I've worked.", present:"Present",
+    exp1_title:"Research Analyst & AI Development",
+    exp1_b1:"Built LangChain RAG pipelines for market data analysis on my own initiative",
+    exp1_b2:"Built agentic n8n workflows connecting multiple APIs and automating recurring research tasks",
+    exp1_b3:"Built a house price prediction model and translated the findings for non-technical decision makers",
+    exp1_b4:"Market research and competitive analysis in Python, with pricing recommendations for the team",
+    exp2_title:"UX Design & Digital Experience",
+    exp2_b1:"Bridged UX standards and AI integration in the product design system",
+    exp2_b2:"Designed campaign content for the online shop, documented Figma components and UX guidelines",
+    exp2_b3:"Quality assurance in staging environments, cross-team collaboration in the Digital Experience group",
+    exp3_title:"UX Researcher · Quantitative Methods",
+    exp3_b1:"Ran quantitative user studies in Python and turned the data into concrete product recommendations",
+    exp4_title:"Internship · Digitalization & Process Development",
+    exp4_b1:"Designed digital processes for the ERP system, gathered requirements and collected operational data",
+    edu_title:"Academic background.", expected:"expected",
+    edu2_note:"International double degree program alongside the Data Engineering Master's.",
+    edu3_note:"Bachelor thesis on the perception of AI-generated visual content. Grade 1.0, N=151, Python analysis.",
+    contact_title:"Let's connect.",
+    footer_host:"Hosted on GitHub Pages"
+  },
+  de: {
+    nav_label:"Navigation", nav_intro:"Einführung", nav_about:"Über mich",
+    nav_projects:"Projekte", nav_skills:"Fähigkeiten & Tools", nav_exp:"Erfahrung",
+    nav_edu:"Ausbildung", nav_contact:"Kontakt",
+    intro_bio:"Ich baue KI-Agenten, die wirklich in Produktion laufen. Aktuell bei Müller Merkle Immobilien, wo ich Research-Workflows mit LangChain und n8n automatisiere, berufsbegleitend im Doppelstudium Data Engineering und Computer Science.",
+    badge_avail:"Ab sofort verfügbar",
+    badge_lang:"🇩🇪 🇹🇷 Muttersprache &nbsp;·&nbsp; 🇬🇧 C1",
+    cta_portfolio:"KI-Portfolio ansehen",
+    about_title:"KI bauen, die wirklich eingesetzt wird.",
+    about_p1:"In die KI bin ich über UX Research gekommen. Nutzerstudien, Design-Systeme, Verhaltensanalysen. Irgendwann fiel mir auf, dass beides dieselbe Grundfähigkeit braucht. Du musst verstehen, wie Menschen wirklich arbeiten, bevor du etwas Sinnvolles für sie bauen kannst.",
+    about_p2:"Bei <strong>Müller Merkle Immobilien</strong> habe ich Automatisierungspotenzial in den Research-Workflows erkannt, weil viele Abläufe repetitiv sind, und einfach angefangen. KI-Agenten in LangChain gebaut, Streamlit als Frontend genutzt, lokal deployed, und das Tool wird heute in der Marktforschung eingesetzt. Den Vorschlag habe ich auch direkt der Geschäftsführung präsentiert. Das ist der Teil, auf den ich am meisten stolz bin.",
+    about_p3:"Was ich mitbringe, ist eine Kombination aus technischer Tiefe und Geschäftssinn. Quantitative Forschung bei IONOS und 1&amp;1, praktische KI-Entwicklung mit LangChain, n8n und RAG, und ein Doppelmaster in Data Engineering und Computer Science.",
+    proj_title:"KI-Portfolio — 3 Live Agents",
+    proj1_desc:"PDF hochladen und direkt loslegen. Der Agent zerlegt das Dokument in Abschnitte, erstellt Embeddings, findet die relevanten Stellen zu jeder Frage und nennt die Quelle. Gebaut mit LangChain, ChromaDB und GPT-4o-mini.",
+    proj2_desc:"Firmenname eingeben, fertigen Report erhalten. Der Agent recherchiert im Web via Tavily, liest mehrere Quellen und schreibt einen strukturierten deutschen Report zu Geschäftsmodell, Marktposition und KI-Potenzial. Mit PDF-Export.",
+    proj3_desc:"Zehn Fragen in fünf Dimensionen: Daten, Prozesse, Team, Führung und Infrastruktur. Das Ergebnis ist ein bewerteter Report mit konkreten KI-Transformationsprioritäten. Mit animierter Score-Anzeige und PDF-Export.",
+    skills_title:"Mein Tech-Stack.",
+    skill_prog:"Programmierung", skill_consult:"Beratung & Methodik", skill_design:"Design & UX",
+    exp_title:"Berufserfahrung.", present:"Heute",
+    exp1_title:"Werkstudent, Research Analyst & KI-Entwicklung",
+    exp1_b1:"LangChain-RAG-Pipelines für Marktdatenanalysen entwickelt, aus eigener Initiative",
+    exp1_b2:"Agentic n8n-Workflows mit API-Anbindungen und automatisierten Rechercheprozessen aufgebaut",
+    exp1_b3:"ML-Modell zur Hauspreisprognose gebaut und die Ergebnisse für nicht-technische Entscheider aufbereitet",
+    exp1_b4:"Marktforschung und Wettbewerbsanalysen in Python, mit Preisempfehlungen für das Team",
+    exp2_title:"Werkstudent, UX Design & Digital Experience",
+    exp2_b1:"UX-Standards und KI-Integration im Designsystem zusammengeführt",
+    exp2_b2:"Kampagneninhalte für den Online-Shop gestaltet, Figma-Komponenten und UX-Guidelines dokumentiert",
+    exp2_b3:"Qualitätssicherung in Staging-Umgebungen, Zusammenarbeit über mehrere Teams hinweg",
+    exp3_title:"Werkstudent, UX Researcher (Quantitative Methoden)",
+    exp3_b1:"Quantitative Nutzerstudien in Python durchgeführt und in konkrete Produktempfehlungen übersetzt",
+    exp4_title:"Pflichtpraktikum, Digitalisierung & Prozessentwicklung",
+    exp4_b1:"Digitale Prozesse für das ERP-System konzipiert, Anforderungen aufgenommen und Betriebsdaten erhoben",
+    edu_title:"Akademischer Hintergrund.", expected:"erwartet",
+    edu2_note:"Internationales Doppelstudium parallel zum Master Data Engineering.",
+    edu3_note:"Bachelorarbeit über die Wahrnehmung KI-generierter visueller Inhalte. Note 1,0, N=151, Python-Auswertung.",
+    contact_title:"Kontakt aufnehmen.",
+    footer_host:"Gehostet auf GitHub Pages"
+  }
+};
+
+// ── APPLY LANGUAGE ──
+let currentLang = 'en';
+function applyLang(lang) {
+  currentLang = lang;
+  const t = T[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key] !== undefined) el.innerHTML = t[key];
+  });
+  document.getElementById('lang-btn').textContent = lang === 'en' ? 'DE' : 'EN';
+  document.documentElement.setAttribute('lang', lang);
+  try { localStorage.setItem('ua-lang', lang); } catch(e){}
+}
+function toggleLang() {
+  applyLang(currentLang === 'en' ? 'de' : 'en');
+}
+try {
+  const saved = localStorage.getItem('ua-lang');
+  if (saved && saved !== 'en') applyLang(saved);
+} catch(e){}
+
+// ── CLOCK ──
+function tick() {
+  const n = new Date();
+  document.getElementById('clock').textContent =
+    String(n.getHours()).padStart(2,'0')+':'+
+    String(n.getMinutes()).padStart(2,'0')+':'+
+    String(n.getSeconds()).padStart(2,'0');
+}
+tick(); setInterval(tick, 1000);
+
+// ── THEME ──
+const MOON = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
+const SUN  = `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`;
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('theme-icon').innerHTML = t === 'dark' ? SUN : MOON;
+}
+function toggleTheme() {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  try { localStorage.setItem('ua-theme', next); } catch(e){}
+}
+try { const s = localStorage.getItem('ua-theme'); if (s) applyTheme(s); } catch(e){}
+
+// ── SCROLL SPY ──
+const sections = document.querySelectorAll('.section');
+const links = document.querySelectorAll('.nav-link');
+const spy = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#'+id));
+    }
+  });
+}, { rootMargin: '-15% 0px -75% 0px' });
+sections.forEach(s => spy.observe(s));
+</script>
+</body>
+</html>
